@@ -124,7 +124,7 @@ const Classes = () => {
         setShowAlert(true);
         setChecked([]);
         setSelectedClass();
-        setSelectedGrade('0');
+        //setSelectedGrade('0');
         setShowAlert(true);
     };
 
@@ -135,8 +135,8 @@ const Classes = () => {
             <h4><u>Enter Class Splits:</u></h4>
             <ol>
                 <li>Select a class, or click ADD NEW CLASS to create a new one.</li>
-                <li>Select a grade and click GET BY GRADE.</li>
-                <li>Check off all students to add to the current class.<br></br>If you select a student that is already in another class, she will be removed from that class and entered into the new class.</li>
+                <li>Check off students to add to the selected class.<br></br>
+                    <span style={{ color: 'red' }}>Warning:</span> If you select a student that is already in another class, she will be removed from that class and entered into the new class.</li>
                 <li>When you are done selecting students, click ADD STUDENTS.</li>
             </ol>
             <Grid container spacing={2}>
