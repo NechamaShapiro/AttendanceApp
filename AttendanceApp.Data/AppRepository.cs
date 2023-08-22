@@ -166,8 +166,8 @@ namespace AttendanceApp.Data
             using var context = new AppContext(_connectionString);
             var time = DateTime.Now.ToString();
             //var time = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 15, 0, 0); // 3:00 PM
-            //var today = DateTime.Now.DayOfWeek.ToString();
-            var today = "Monday";
+            var today = DateTime.Now.DayOfWeek.ToString();
+            //var today = "Monday";
 
             var courseInfo = context.CourseInfos.FromSqlInterpolated($@"
                 SELECT t.Name as 'TeacherName', c.Subject, c.Grade, cs.CourseId,  
@@ -205,8 +205,8 @@ namespace AttendanceApp.Data
         public List<CourseInfo> GetCoursesForStudent(int studentId)
         {
             using var context = new AppContext(_connectionString);
-            //var today = DateTime.Now.DayOfWeek.ToString();
-            var today = "Monday";
+            var today = DateTime.Now.DayOfWeek.ToString();
+            //var today = "Monday";
             var courses = context.CourseInfos.FromSqlInterpolated($@"
                 SELECT t.Name as 'TeacherName', c.Subject, c.Grade, cs.CourseId, s.Name,  
                 CONVERT(time, cs.StartTime) AS 'StartTime', CONVERT(time, cs.EndTime) AS 'EndTime'

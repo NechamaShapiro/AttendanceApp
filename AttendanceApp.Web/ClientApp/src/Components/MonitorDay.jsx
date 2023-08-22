@@ -136,16 +136,16 @@ Row.propTypes = {
 };
 
 const rows = [
-    createData('1st period'),
-    createData('2nd period'),
-    createData('3rd period'),
-    createData('4th period'),
-    createData('5th period'),
-    createData('6th period'),
-    createData('7th period'),
-    createData('8th period'),
-    createData('9th period'),
-    createData('10th period'),
+    createData('9:00-9:40'),
+    createData('9:40-10:20'),
+    createData('10:30-11:10'),
+    createData('11:10-11:50'),
+    createData('11:50-12:30'),
+    createData('1:00-1:40'),
+    createData('1:40-2:20'),
+    createData('2:30-3:10'),
+    createData('3:10-3:50'),
+    createData('4:00-4:40'),
 ];
 
 export default function CollapsibleTable() {
