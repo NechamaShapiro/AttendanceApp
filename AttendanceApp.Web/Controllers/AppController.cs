@@ -5,7 +5,6 @@ using System.Security.Cryptography.X509Certificates;
 
 namespace AttendanceApp.Web.Controllers
 {
-    //github test
     [Route("api/[controller]")]
     [ApiController]
     public class AppController : ControllerBase
