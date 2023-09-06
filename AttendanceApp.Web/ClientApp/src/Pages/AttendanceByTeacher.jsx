@@ -16,6 +16,7 @@ import {
 } from '@mui/material';
 import loading from '../Images/loading.gif';
 import EditIcon from '@mui/icons-material/Edit';
+import { DatePicker } from '@mui/x-date-pickers';
 const AttendanceByTeacher = ({ teacherId }) => {
     const [isLoading, setIsLoading] = useState(true);
     const [teacherName, setTeacherName] = useState('');
@@ -148,6 +149,21 @@ const AttendanceByTeacher = ({ teacherId }) => {
             console.log('Attendance records sent successfully');
         } catch (error) {
             console.error('Error sending attendance records:', error);
+        }
+        try {
+            //format time for backend
+            const startHours = startTime.getHours();
+            const startMinutes = startTime.getMinutes();
+            const startSeconds = startTime.getSeconds();
+            const formattedStartTime = `${startHours.toString().padStart(2, '0')}:${startMinutes.toString().padStart(2, '0')}:${startSeconds.toString().padStart(2, '0')}`;
+            const endHours = endTime.getHours();
+            const endMinutes = endTime.getMinutes();
+            const endSeconds = endTime.getSeconds();
+            const formattedEndTime = `${endHours.toString().padStart(2, '0')}:${endMinutes.toString().padStart(2, '0')}:${endSeconds.toString().padStart(2, '0')}`;
+            await axios.post(`/api/app/tookattendance?date=${date.toISOString().split('T')[0]}&courseId=${courseId}&startTime=${formattedStartTime}&endTime=${formattedEndTime}`);
+            console.log('Attendance taken');
+        } catch (error) {
+            console.error('Error taking attendance:', error);
         }
         //reset all values in state?
     };

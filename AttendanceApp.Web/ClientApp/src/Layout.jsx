@@ -126,7 +126,7 @@ const Layout = (props) => {
                                     </ListItem>
                                 </Collapse>
                                 <ListItem key="Compliance" disablePadding>
-                                    <ListItemButton>
+                                    <ListItemButton component={Link} to='/compliance'>
                                         <ListItemIcon>
                                             <GradingIcon />
                                         </ListItemIcon>

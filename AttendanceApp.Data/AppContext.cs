@@ -26,6 +26,7 @@ namespace AttendanceApp.Data
         public DbSet<CourseSession> CourseSessions { get; set; }
         public DbSet<Class> Classes { get; set; }
         public DbSet<CourseInfo> CourseInfos { get; set; }
+        public DbSet<AttendanceTaken> TookAttendance { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlServer(_connectionString);

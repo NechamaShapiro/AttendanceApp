@@ -1,173 +1,87 @@
-import * as React from 'react';
-import PropTypes from 'prop-types';
+import React, { useState } from 'react';
 import { Box, Collapse, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Paper, Checkbox } from '@mui/material';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import MonitorPeriod from './MonitorPeriod';
+import MonitorPeriod from '../Pages/MonitorPeriod';
+import CheckIcon from '@mui/icons-material/Check';
+import ClearIcon from '@mui/icons-material/Clear';
 
-function createData(teacher) {
-    return {
-        teacher,
-        period: [
-            {
-                teacher: 'Mrs. Weinberger',
-                subject: 'Chumash',
-                tookAttendance: 'no',
-            },
-            {
-                teacher: 'Rabbi Arieh',
-                subject: 'Halacha',
-                tookAttendance: 'yes',
-            },
-            {
-                teacher: 'Mrs. Stein',
-                subject: 'Machshava',
-                tookAttendance: 'yes',
-            },
-            {
-                teacher: 'Mrs. Gornish',
-                subject: 'Tzohar',
-                tookAttendance: 'no',
-            },
-            {
-                teacher: 'Rabbi Kramer',
-                subject: 'Halacha',
-                tookAttendance: 'yes',
-            },
-            {
-                teacher: 'Mrs. Epstein',
-                subject: 'Tehillim',
-                tookAttendance: 'no',
-            },
-            {
-                teacher: 'Mrs. Puretz',
-                subject: 'Tefila',
-                tookAttendance: 'no',
-            },
-            {
-                teacher: 'Mrs. Polakoff',
-                subject: 'Navi',
-                tookAttendance: 'no',
-            },
-            {
-                teacher: 'Mrs. Rosen',
-                subject: 'Yirmiyahu',
-                tookAttendance: 'yes',
-            },
-            {
-                teacher: 'Mrs. Sprung',
-                subject: 'Yehadus',
-                tookAttendance: 'yes',
-            },
-            {
-                teacher: 'Mrs. Spetner',
-                subject: 'Navi',
-                tookAttendance: 'yes',
-            },
-            {
-                teacher: 'Mrs. Rapps',
-                subject: 'Chumash',
-                tookAttendance: 'yes',
-            },
-            {
-                teacher: 'Mrs. Brick',
-                subject: 'Megila',
-                tookAttendance: 'yes',
-            },
-            {
-                teacher: 'Mrs. Weingot',
-                subject: 'Inyanei Diyoma',
-                tookAttendance: 'yes',
-            },
-        ],
+const MonitorDay = () => {
+    const periods = [
+        { period: 1, startTime: '09:00', endTime: '09:40', startTimeDisplay: '9:00 AM', endTimeDisplay: '9:40 AM' },
+        { period: 2, startTime: '09:40', endTime: '10:20', startTimeDisplay: '9:40 AM', endTimeDisplay: '10:20 AM' },
+        { period: 3, startTime: '10:30', endTime: '11:10', startTimeDisplay: '10:30 AM', endTimeDisplay: '11:10 AM' },
+        { period: 4, startTime: '11:10', endTime: '11:50', startTimeDisplay: '11:10 AM', endTimeDisplay: '11:50 AM' },
+        { period: 5, startTime: '11:50', endTime: '12:30', startTimeDisplay: '11:50 AM', endTimeDisplay: '12:30 PM' },
+        { period: 6, startTime: '13:00', endTime: '13:40', startTimeDisplay: '1:00 PM', endTimeDisplay: '1:40 PM' },
+        { period: 7, startTime: '13:40', endTime: '14:20', startTimeDisplay: '1:40 PM', endTimeDisplay: '2:20 PM' },
+        { period: 8, startTime: '14:30', endTime: '15:10', startTimeDisplay: '2:30 PM', endTimeDisplay: '3:10 PM' },
+        { period: 9, startTime: '15:10', endTime: '15:50', startTimeDisplay: '3:10 PM', endTimeDisplay: '3:50 PM' },
+        { period: 10, startTime: '16:00', endTime: '16:40', startTimeDisplay: '4:00 PM', endTimeDisplay: '4:40 PM' }
+    ];
+    const [openStates, setOpenStates] = useState(Array(periods.length).fill(false)); // Manage expansion states for each period
+    const toggleRow = (index) => {
+        const newOpenStates = [...openStates];
+        newOpenStates[index] = !newOpenStates[index];
+        setOpenStates(newOpenStates);
     };
-}
-
-function Row(props) {
-    const { row } = props;
-    const [open, setOpen] = React.useState(false);
-
     return (
-        <React.Fragment>
-            <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
-                <TableCell>
-                    <IconButton
-                        aria-label="expand row"
-                        size="small"
-                        onClick={() => setOpen(!open)}
-                    >
-                        {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-                    </IconButton>
-                </TableCell>
-                <TableCell component="th" scope="row" style={{ fontSize: 20 }}>
-                    <Typography variant="h6" component="p">
-                        {row.teacher}
-                    </Typography>
-                </TableCell>
-                {/* WORK ON CHECKBOX THAT INDICATES IF THAT PERIOD HAS 100% OF TEACHERS TAKING ATTENDANCE */}
-                <TableCell>
-                    <Checkbox label="100%" disabled />
-                </TableCell>
-            </TableRow>
-            <TableRow>
-                <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
-                    <Collapse in={open} timeout="auto" unmountOnExit>
-                        <Box sx={{ margin: 1 }}>
-                            <MonitorPeriod />
-                        </Box>
-                    </Collapse>
-                </TableCell>
-            </TableRow>
-        </React.Fragment>
-    );
-}
-
-Row.propTypes = {
-    row: PropTypes.shape({
-        period: PropTypes.arrayOf(
-            PropTypes.shape({
-                tookAttendance: PropTypes.string.isRequired,
-                subject: PropTypes.string.isRequired,
-                teacher: PropTypes.string.isRequired,
-            }),
-        ).isRequired,
-        teacher: PropTypes.string.isRequired,
-    }).isRequired,
-};
-
-const rows = [
-    createData('9:00-9:40'),
-    createData('9:40-10:20'),
-    createData('10:30-11:10'),
-    createData('11:10-11:50'),
-    createData('11:50-12:30'),
-    createData('1:00-1:40'),
-    createData('1:40-2:20'),
-    createData('2:30-3:10'),
-    createData('3:10-3:50'),
-    createData('4:00-4:40'),
-];
-
-export default function CollapsibleTable() {
-    return (
-        <TableContainer component={Paper}>
+        <TableContainer>
             <Table aria-label="collapsible table" style={{ width: 1000 }} align="center">
                 <TableHead>
                     <TableRow>
                         <TableCell />
                         <TableCell>
                             <Typography variant="h4" component="h1">
-                                Today, 6/22
+                                Today, {new Date().toLocaleDateString()}
                             </Typography>
+                        </TableCell>
+                        <TableCell align='center'>
+                            Everyone took attendance?
                         </TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {rows.map((row) => (
-                        <Row key={row.teacher} row={row} />
+                    {periods.map((p, index) => (
+                        <React.Fragment key={p.period}>
+                            <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
+                                <TableCell width={100}>
+                                    <IconButton
+                                        aria-label="expand row"
+                                        size="small"
+                                        onClick={() => toggleRow(index)}
+                                    >
+                                        {openStates[index] ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+                                    </IconButton>
+                                </TableCell>
+                                <TableCell style={{ fontSize: 20 }}>
+                                    <Typography variant="h6" component="p">
+                                        Period {p.period}, {p.startTimeDisplay}-{p.endTimeDisplay}
+                                    </Typography>
+                                </TableCell>
+                                <TableCell align='center'>
+                                    <ClearIcon color='error' />
+                                </TableCell>
+                            </TableRow>
+                            <TableRow>
+                                <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+                                    <Collapse in={openStates[index]} timeout="auto" unmountOnExit>
+                                        <Box sx={{ margin: 1 }}>
+                                            <MonitorPeriod
+                                                date={new Date ()}
+                                                startTime={p.startTime}
+                                                endTime={p.endTime}
+                                            />
+                                        </Box>
+                                    </Collapse>
+                                </TableCell>
+                            </TableRow>
+                        </React.Fragment>
                     ))}
                 </TableBody>
             </Table>
         </TableContainer>
     );
 }
+
+export default MonitorDay;

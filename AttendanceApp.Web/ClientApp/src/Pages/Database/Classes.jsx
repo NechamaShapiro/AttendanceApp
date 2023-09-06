@@ -71,31 +71,36 @@ const Classes = () => {
             const grade = indexOfDelimiter !== -1
                 ? className.substring(0, indexOfDelimiter)
                 : className;
-            setSelectedGrade(grade);
-
-            const getStudentsByGrade = async () => {
-                try {
-                    const { data } = await axios.get(`/api/app/getbygrade?grade=${grade}`)
-                    data.sort(function (a, b) {
-                        if (a.name < b.name) {
-                            return -1;
-                        }
-                        if (a.name > b.name) {
-                            return 1;
-                        }
-                        return 0;
-                    });
-                    setStudents(data);
-                    setIsLoading(false);
-                } catch (error) {
-                    // Handle error here if needed
-                    console.error(error);
-                }
+            if (selectedGrade === grade) {
+                setIsLoading(false);
+            } else {
+                setSelectedGrade(grade);
             }
-            getStudentsByGrade();
         }
     }, [selectedClass]);
 
+    const getStudentsByGrade = async () => {
+        try {
+            const { data } = await axios.get(`/api/app/getbygrade?grade=${selectedGrade}`)
+            data.sort(function (a, b) {
+                if (a.name < b.name) {
+                    return -1;
+                }
+                if (a.name > b.name) {
+                    return 1;
+                }
+                return 0;
+            });
+            setStudents(data);
+            setIsLoading(false);
+        } catch (error) {
+            // Handle error here if needed
+            console.error(error);
+        }
+    }
+    useEffect(() => {
+        getStudentsByGrade();
+    }, [selectedGrade]);
     const handleToggle = (student) => () => {
         const currentIndex = checked.indexOf(student);
         const newChecked = [...checked];
@@ -112,19 +117,16 @@ const Classes = () => {
         getClasses();
     };
     const onAddClick = async () => {
-        // if(checked.some(c => c.classId == 0)) {
-        //     setOpenWarning(true);
-        // }
         const studentIds = checked.map(student => student.id);
         console.log("classId", selectedClass);
         const formData = new URLSearchParams();
         formData.append('classId', selectedClass);
         studentIds.forEach(id => formData.append('studentIds', id));
         await axios.post('/api/app/createclasssplit', formData);
+        getStudentsByGrade();
         setShowAlert(true);
         setChecked([]);
         setSelectedClass();
-        //setSelectedGrade('0');
         setShowAlert(true);
     };
 
@@ -144,7 +146,7 @@ const Classes = () => {
                     <Autocomplete
                         disablePortal
                         options={classes}
-                        getOptionLabel={(option) => option.className}
+                        getOptionLabel={(option) => option.className || ''}
                         sx={{ width: 150 }}
                         renderInput={(params) => <TextField {...params} label="Select Class" />}
                         onChange={onClassChange}

@@ -164,8 +164,8 @@ namespace AttendanceApp.Data
         public CourseInfo GetCourseInfo(int teacherId)
         {
             using var context = new AppContext(_connectionString);
-            var time = DateTime.Now.ToString();
-            //var time = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 15, 0, 0); // 3:00 PM
+            //var time = DateTime.Now.ToString();
+            var time = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 13, 30, 0); // 13:30 PM
             var today = DateTime.Now.DayOfWeek.ToString();
             //var today = "Monday";
 
@@ -191,7 +191,7 @@ namespace AttendanceApp.Data
         public void EnterAttendance(List<AttendanceRecord> attendanceRecords)
         {
             using var context = new AppContext(_connectionString);
-            foreach(AttendanceRecord record in attendanceRecords)
+            foreach (AttendanceRecord record in attendanceRecords)
             {
                 context.AttendanceRecords.Add(record);
             }
@@ -219,6 +219,101 @@ namespace AttendanceApp.Data
                 .ToList();
             return courses;
         }
+        public void TookAttendance(DateTime date, int courseId, TimeSpan startTime, TimeSpan endTime)
+        {
+            using var context = new AppContext(_connectionString);
+
+            // Check if a similar attendance record already exists
+            bool attendanceExists = context.TookAttendance.Any(a =>
+                a.Date == date &&
+                a.CourseId == courseId &&
+                a.StartTime == startTime &&
+                a.EndTime == endTime);
+
+            if (!attendanceExists)
+            {
+                // If no similar attendance record exists, add a new one
+                context.TookAttendance.Add(new AttendanceTaken
+                {
+                    Date = date,
+                    CourseId = courseId,
+                    StartTime = startTime,
+                    EndTime = endTime
+                });
+
+                context.SaveChanges();
+            }
+        }
+        public List<CourseInfo> GetCurrentPeriodInfo(DateTime estDateTime)
+        {
+            using var context = new AppContext(_connectionString);
+            var courses = context.CourseInfos.FromSqlInterpolated($@"
+                SELECT t.Name as 'TeacherName', c.Subject, c.Grade, cs.CourseId, cs.StartTime, cs.EndTime FROM CourseSessions cs
+                JOIN Courses c
+                ON cs.CourseId = c.Id
+                JOIN Teachers t
+                ON c.TeacherId = t.Id
+                WHERE StartTime < {estDateTime.ToShortTimeString()} AND EndTime > {estDateTime.ToShortTimeString()} AND DayOfWeek = {estDateTime.DayOfWeek.ToString()}")
+                .ToList();
+            return courses;
+        }
+        public List<CourseInfo> GetPeriodInfo(DateTime estDateTime, string startTime, string endTime)
+        {
+            using var context = new AppContext(_connectionString);
+            var courses = context.CourseInfos.FromSqlInterpolated($@"
+                SELECT t.Name as 'TeacherName', c.Subject, c.Grade, cs.CourseId, cs.StartTime, cs.EndTime FROM CourseSessions cs
+                JOIN Courses c
+                ON cs.CourseId = c.Id
+                JOIN Teachers t
+                ON c.TeacherId = t.Id
+                WHERE StartTime = {startTime} AND EndTime = {endTime} AND DayOfWeek = {estDateTime.DayOfWeek.ToString()}")
+                .ToList();
+            return courses;
+        }
+        //public List<int> GetAttendanceTakenInfo()
+        //{
+        //    using var context = new AppContext(_connectionString);
+        //    //DateTime today = DateTime.Now;
+        //    //DateTime referenceTime = new DateTime(today.Year, today.Month, today.Day, 0, 0, 0); // Set the reference time to midnight
+
+        //    //TimeSpan currentTime = today - referenceTime;
+
+        //    //var courseIds = context.TookAttendance
+        //    //    .Where(t => t.StartTime < currentTime && t.EndTime > currentTime && t.Date == today)
+        //    //    .Select(t => t.CourseId)
+        //    //    .ToList();
+
+        //    //var currentTime = DateTime.Now.ToString();
+        //    var currentTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 13, 30, 0).ToString(); // 1:30 PM
+        //    var today = DateTime.Now;
+
+        //    var courseIds = context.TookAttendance.FromSqlInterpolated($@"
+        //        SELECT CourseId FROM TookAttendance
+        //        WHERE StartTime < {currentTime} AND EndTime > {currentTime} AND Date = {today}
+        //        ")
+        //        .Select(item => item.CourseId) // Extract CourseId values
+        //        .ToList();
+
+
+        //    return courseIds;
+        //}
+        public List<int> GetAttendanceTakenInfo(DateTime estDateTime)
+        {
+            using var context = new AppContext(_connectionString);
+
+            //var now = DateTime.Now;
+            //var currentTime = now.TimeOfDay;
+            var currentTime = new TimeSpan(13, 30, 0); // 1:30 PM
+            var today = DateTime.Now.Date; // Get the current date without the time component
+
+            var courseIds = context.TookAttendance
+                .Where(t => t.StartTime < estDateTime.TimeOfDay && t.EndTime > estDateTime.TimeOfDay && t.Date.Date == estDateTime.Date)
+                .Select(t => t.CourseId)
+                .ToList();
+
+            return courseIds;
+        }
+
 
     }
 }

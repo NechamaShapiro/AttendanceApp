@@ -1,6 +1,7 @@
 ﻿using AttendanceApp.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Globalization;
 using System.Security.Cryptography.X509Certificates;
 
 namespace AttendanceApp.Web.Controllers
@@ -172,6 +173,44 @@ namespace AttendanceApp.Web.Controllers
         {
             var repo = new AppRepository(_connectionString);
             return repo.GetCoursesForStudent(studentId);
+        }
+
+        [HttpPost]
+        [Route("tookattendance")]
+        public void TookAttendance(string date, int courseId, TimeSpan startTime, TimeSpan endTime)
+        {
+            var repo = new AppRepository(_connectionString);
+            DateTime formattedDate = DateTime.ParseExact(date, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+            repo.TookAttendance(formattedDate, courseId, startTime, endTime);
+        }
+
+        [HttpGet]
+        [Route("getcurrentperiodinfo")]
+        public List<CourseInfo> GetCurrentPeriodInfo(DateTime utcDateTime)
+        {
+            var repo = new AppRepository(_connectionString);
+            DateTime estDateTime = TimeZoneInfo.ConvertTimeFromUtc(utcDateTime, TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time"));
+            return repo.GetCurrentPeriodInfo(estDateTime);
+
+        }
+
+        [HttpGet]
+        [Route("getperiodinfo")]
+        public List<CourseInfo> GetPeriodInfo(DateTime utcDateTime, string startTime, string endTime)
+        {
+            var repo = new AppRepository(_connectionString);
+            DateTime estDateTime = TimeZoneInfo.ConvertTimeFromUtc(utcDateTime, TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time"));
+            return repo.GetPeriodInfo(estDateTime, startTime, endTime);
+           
+        }
+
+        [HttpGet]
+        [Route("getattendancetakeninfo")]
+        public List<int> GetAttendanceTakenInfo(DateTime utcDateTime)
+        {
+            var repo = new AppRepository(_connectionString);
+            DateTime estDateTime = TimeZoneInfo.ConvertTimeFromUtc(utcDateTime, TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time"));
+            return repo.GetAttendanceTakenInfo(estDateTime);
         }
     }
 }

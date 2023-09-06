@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Box, Collapse, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Checkbox } from '@mui/material';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import MonitorPeriod from '../Components/MonitorPeriod';
+import MonitorPeriod from './MonitorPeriod';
 
 function createData(teacher) {
     return {
