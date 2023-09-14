@@ -16,30 +16,83 @@ import Classes from './Pages/Database/Classes';
 import AttendanceByTeacher from './Pages/AttendanceByTeacher';
 import MonitorPeriod from './Pages/MonitorPeriod';
 import Compliance from './Pages/Compliance';
+import { AuthContextComponent } from './AuthContext';
+import PrivateRoute from './Components/PrivateRoute';
+import Logout from './Pages/Logout';
+import CreateAccount from './Pages/CreateAccount';
+
 const App = () => {
     return (
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <Layout>
-                <Routes>
-                    <Route exact path='/' element={<AdminHome />} />
-                    <Route exact path='/login' element={<Login />} />
+        <AuthContextComponent>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <Layout>
+                    <Routes>
+                        <Route exact path='/' element={<AdminHome />} />
+                        <Route exact path='/login' element={<Login />} />
+                        <Route exact path='/logout' element={
+                            <PrivateRoute>
+                                <Logout />
+                            </PrivateRoute>
+                        } />
 
-                    <Route exact path='/database/enter-students' element={<EnterStudents />} />
-                    <Route exact path='/database/classes' element={<Classes />} />
-                    <Route exact path='/database/courses' element={<Courses />} />
+                        <Route exact path='/database/enter-students' element={
+                            <PrivateRoute>
+                                <EnterStudents />
+                            </PrivateRoute>
+                        } />
+                        <Route exact path='/database/classes' element={
+                            <PrivateRoute>
+                                <Classes />
+                            </PrivateRoute>
+                        } />
+                        <Route exact path='/database/courses' element={
+                            <PrivateRoute>
+                                <Courses />
+                            </PrivateRoute>
+                        } />
 
-                    <Route exact path='/attendance/monitoring' element={<MonitorAttendance />} />
-                    <Route exact path='/attendance/monitoring/monitor-day' element={<MonitorDay />} />
-                    <Route exact path='/attendance/monitoring/monitor-period' element={<MonitorPeriod />} />
-                    <Route exact path='/attendance/entry' element={<EnterAttendance />} />
-                    <Route exact path='/attendance/entry/by-teacher' element={<AttendanceByTeacher />} />
+                        <Route exact path='/attendance/monitoring' element={
+                            <PrivateRoute>
+                                <MonitorAttendance />
+                            </PrivateRoute>
+                        } />
+                        <Route exact path='/attendance/monitoring/monitor-day' element={
+                            <PrivateRoute>
+                                <MonitorDay />
+                            </PrivateRoute>
+                        } />
+                        <Route exact path='/attendance/monitoring/monitor-period' element={
+                            <PrivateRoute>
+                                <MonitorPeriod />
+                            </PrivateRoute>
+                        } />
+                        <Route exact path='/attendance/entry' element={<EnterAttendance />} />
+                        <Route exact path='/attendance/entry/by-teacher' element={<AttendanceByTeacher />} />
 
-                    <Route exact path='/compliance' element={<Compliance />} />
-                    <Route exact path='/reports' element={<Reports />} />
-                    <Route exact path='/help' element={<Help />} />
-                </Routes>
-            </Layout>
-        </LocalizationProvider>
+                        <Route exact path='/compliance' element={
+                            <PrivateRoute>
+                                <Compliance />
+                            </PrivateRoute>
+                        } />
+                        <Route exact path='/reports' element={
+                            <PrivateRoute>
+                                <Reports />
+                            </PrivateRoute>
+                        } />
+                        <Route exact path='create-account' element={
+                            // <PrivateRoute>
+                                <CreateAccount />
+                            // </PrivateRoute>
+                        } />
+                        <Route exact path='/help' element={
+                            <PrivateRoute>
+                                <Help />
+                            </PrivateRoute>
+                        } />
+                    </Routes>
+                </Layout>
+            </LocalizationProvider>
+        </AuthContextComponent>
     );
 };
 

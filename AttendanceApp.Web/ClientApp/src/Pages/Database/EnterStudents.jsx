@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { 
-    TextField, 
-    Button, 
-    FormControl, 
-    InputLabel, 
-    Select, 
-    MenuItem 
+import {
+    TextField,
+    Button,
+    FormControl,
+    InputLabel,
+    Select,
+    MenuItem,
+    Typography,
+    Input
 } from '@mui/material';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import AddIcon from '@mui/icons-material/Add';
@@ -14,6 +16,55 @@ import AddIcon from '@mui/icons-material/Add';
 const EnterStudents = () => {
     const [names, setNames] = useState(['']);
     const [studentGrade, setStudentGrade] = useState('select');
+    const [selectedFile, setSelectedFile] = useState(null);
+
+    const handleFileInputChange = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            // Check if the selected file type is allowed
+            if (isValidFileType(file)) {
+                setSelectedFile(file);
+            } else {
+                alert('Invalid file type. Please select a valid file.');
+                event.target.value = null; // Clear the file input
+            }
+        }
+    };
+
+    const isValidFileType = (file) => {
+        const acceptedTypes = ['.xlsx', '.xls']; // Specify accepted file types here
+        const fileName = file.name || '';
+
+        // Check if the file name has one of the accepted extensions
+        const fileExtension = fileName.split('.').pop();
+        return acceptedTypes.includes(`.${fileExtension}`);
+    };
+
+    const handleUpload = async () => {
+        if (!selectedFile) {
+            alert('Please select a file to upload.');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('excelFile', selectedFile);
+
+        try {
+            // Adjust the URL to match your backend endpoint
+            const response = await axios.post(`http://localhost:3000/api/app/uploadstudents`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+
+            console.log(response.data);
+            alert('File uploaded successfully.');
+        } catch (error) {
+            console.error('Error uploading file:', error);
+            alert('An error occurred while uploading the file.');
+        }
+    };
+
     const handleGradeChange = (event) => {
         setStudentGrade(event.target.value);
     };
@@ -46,7 +97,7 @@ const EnterStudents = () => {
             <h4><u>Enter Students:</u></h4>
             <ol>
                 <li>Select a grade to add students to.</li>
-                <li>Enter the name of the student [Last, First].</li>
+                <li>Upload an excel spreadsheet with a list of students (one grade at a time) OR enter the name of the student manually [Last, First].</li>
                 <li>Click on the <AddIcon color='primary' /> to add multiple students.</li>
                 <li>Use the <DeleteOutlinedIcon color='error' /> as needed.</li>
                 <li>Click ADD ALL STUDENTS.</li>
@@ -66,6 +117,38 @@ const EnterStudents = () => {
                     <MenuItem key={12} value={12}>12th Grade</MenuItem>
                 </Select>
             </FormControl>
+            <br></br><br></br>
+            <FormControl>
+                {/* <InputLabel htmlFor="file-input">Choose a file</InputLabel> */}
+                <Input
+                    id="file-input"
+                    type="file"
+                    onChange={handleFileInputChange}
+                    accept=".xlsx, .xls" // Specify accepted file types here
+                    style={{ display: 'none' }}
+                />
+                <Button
+                    variant="outlined"
+                    component="label"
+                    htmlFor="file-input"
+                    color='secondary'
+                >
+                    Choose File
+                </Button>
+            </FormControl>
+            {selectedFile && (
+                <Typography variant="body1" gutterBottom>
+                    Selected File: {selectedFile.name}
+                </Typography>
+            )}
+            <Button
+                variant="contained"
+                onClick={handleUpload}
+                disabled={!selectedFile}
+                color='secondary'
+            >
+                Upload
+            </Button>
             <br></br><br></br>
             {names.map((name, index) => (
                 <div key={index}>

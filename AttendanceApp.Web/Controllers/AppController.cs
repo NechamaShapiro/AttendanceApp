@@ -1,6 +1,9 @@
 ﻿using AttendanceApp.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using OfficeOpenXml;
 using System.Globalization;
 using System.Security.Cryptography.X509Certificates;
 
@@ -8,6 +11,7 @@ namespace AttendanceApp.Web.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class AppController : ControllerBase
     {
         private readonly string _connectionString;
@@ -97,7 +101,7 @@ namespace AttendanceApp.Web.Controllers
         public void AddSession(int courseId, [FromBody] List<CourseSession> newSessions)
         {
             var repo = new AppRepository(_connectionString);
-            foreach(var session in newSessions)
+            foreach (var session in newSessions)
             {
                 repo.AddSession(courseId, session.DayOfWeek, session.StartTime, session.EndTime);
             }
@@ -201,7 +205,7 @@ namespace AttendanceApp.Web.Controllers
             var repo = new AppRepository(_connectionString);
             DateTime estDateTime = TimeZoneInfo.ConvertTimeFromUtc(utcDateTime, TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time"));
             return repo.GetPeriodInfo(estDateTime, startTime, endTime);
-           
+
         }
 
         [HttpGet]
@@ -212,5 +216,76 @@ namespace AttendanceApp.Web.Controllers
             DateTime estDateTime = TimeZoneInfo.ConvertTimeFromUtc(utcDateTime, TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time"));
             return repo.GetAttendanceTakenInfo(estDateTime);
         }
+
+        #region Upload Excel Stuff
+        [HttpPost]
+        [Route("uploadstudents")]
+        public async Task<IActionResult> UploadExcel(IFormFile file)
+        {
+            var repo = new AppRepository(_connectionString);
+
+            if (file == null || file.Length == 0)
+            {
+                return BadRequest("No file uploaded.");
+            }
+
+            try
+            {
+                if (!IsExcelFile(file))
+                {
+                    return BadRequest("Invalid file type. Please upload an Excel spreadsheet.");
+                }
+
+                using (var stream = new MemoryStream())
+                {
+                    await file.CopyToAsync(stream);
+                    using (var package = new ExcelPackage(stream))
+                    {
+                        var worksheet = package.Workbook.Worksheets[0];
+                        var rowCount = worksheet.Dimension.Rows;
+
+                        for (int row = 2; row <= rowCount; row++)
+                        {
+                            var lastName = worksheet.Cells[row, 1].Text;
+                            var firstName = worksheet.Cells[row, 2].Text;
+
+                            if (!string.IsNullOrEmpty(lastName) && !string.IsNullOrEmpty(firstName))
+                            {
+                                // Combine LastName and FirstName into a single formatted string
+                                var fullName = $"{lastName}, {firstName}";
+
+                                // Create a student object with the combined name
+                                var student = new Student
+                                {
+                                    Name = fullName
+                                    //Grade = grade
+                                };
+
+
+                                // Add the student to the repository
+                                await repo.AddStudentAsync(student);
+                            }
+
+                        }
+                    }
+
+                    return Ok("File uploaded and student records saved successfully.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine("Error processing Excel file: " + ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while processing the Excel file.");
+            }
+        }
+
+        private bool IsExcelFile(IFormFile file)
+        {
+            var allowedContentTypes = new[] { "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" };
+            return Array.Exists(allowedContentTypes, type => type.Equals(file.ContentType, StringComparison.OrdinalIgnoreCase));
+        }
+        #endregion
+
+        
     }
 }

@@ -314,6 +314,13 @@ namespace AttendanceApp.Data
             return courseIds;
         }
 
+        //UPLOAD EXCEL STUFF
+        public async Task AddStudentAsync(Student student)
+        {
+            using var context = new AppContext(_connectionString);
+            context.Students.Add(student);
+            await context.SaveChangesAsync();
+        }
 
     }
 }

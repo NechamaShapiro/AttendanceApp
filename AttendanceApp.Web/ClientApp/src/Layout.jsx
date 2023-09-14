@@ -24,10 +24,14 @@ import HomeIcon from '@mui/icons-material/Home';
 import GradingIcon from '@mui/icons-material/Grading';
 import SummarizeIcon from '@mui/icons-material/Summarize';
 import PersonIcon from '@mui/icons-material/Person';
-
+import LoginIcon from '@mui/icons-material/Login';
+import LogoutIcon from '@mui/icons-material/Logout';
+import { useAuth } from './AuthContext';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
 const drawerWidth = 240;
 
-const Layout = (props) => {
+const Layout = ({ children }) => {
+    const { user } = useAuth();
     const [openDatabaseCollapse, setOpenDatabaseCollapse] = useState(false);
     const [openAttendanceCollapse, setOpenAttendanceCollapse] = useState(false);
 
@@ -49,14 +53,14 @@ const Layout = (props) => {
                                     Attendance App
                                 </Typography>
                             </Box>
-                            <Box sx={{ flexGrow: 0 }}>
+                            {!!user && <Box sx={{ flexGrow: 0 }}>
                                 <Tooltip>
                                     <IconButton sx={{ p: 0 }}>
                                         <PersonIcon></PersonIcon>
-                                        <Typography>Current User</Typography>
+                                        <Typography>{user.username}</Typography>
                                     </IconButton>
                                 </Tooltip>
-                            </Box>
+                            </Box>}
                         </Toolbar>
                     </AppBar>
                     <Drawer
@@ -78,16 +82,31 @@ const Layout = (props) => {
                                         <ListItemText primary="Home" />
                                     </ListItemButton>
                                 </ListItem>
-
-                                <ListItem key="Database Setup" disablePadding>
+                                {!user && <ListItem key="Login" disablePadding>
+                                    <ListItemButton component={Link} to='/login'>
+                                        <ListItemIcon>
+                                            <LoginIcon />
+                                        </ListItemIcon>
+                                        <ListItemText primary="Login" />
+                                    </ListItemButton>
+                                </ListItem>}
+                                {!!user && <ListItem key="Logout" disablePadding>
+                                    <ListItemButton component={Link} to='/logout'>
+                                        <ListItemIcon>
+                                            <LogoutIcon />
+                                        </ListItemIcon>
+                                        <ListItemText primary="Logout" />
+                                    </ListItemButton>
+                                </ListItem>}
+                                {!!user && <ListItem key="Database Setup" disablePadding>
                                     <ListItemButton onClick={handleOpenDatabaseCollapse}>
                                         <ListItemIcon>
                                             {openDatabaseCollapse ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
                                         </ListItemIcon>
                                         <ListItemText primary="Database Setup" />
                                     </ListItemButton>
-                                </ListItem>
-                                <Collapse in={openDatabaseCollapse} timeout="auto" unmountOnExit>
+                                </ListItem>}
+                                {!!user && <Collapse in={openDatabaseCollapse} timeout="auto" unmountOnExit>
                                     <ListItem key="Enter Students" disablePadding>
                                         <ListItemButton component={Link} to='/database/enter-students'>
                                             <ListItemText inset primary="Enter Students" />
@@ -103,17 +122,17 @@ const Layout = (props) => {
                                             <ListItemText inset primary="Create Courses" />
                                         </ListItemButton>
                                     </ListItem>
-                                </Collapse>
+                                </Collapse>}
 
-                                <ListItem key="Attendance" disablePadding>
+                                {!!user && <ListItem key="Attendance" disablePadding>
                                     <ListItemButton onClick={handleOpenAttendanceCollapse}>
                                         <ListItemIcon>
                                             {openAttendanceCollapse ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
                                         </ListItemIcon>
                                         <ListItemText primary="Attendance" />
                                     </ListItemButton>
-                                </ListItem>
-                                <Collapse in={openAttendanceCollapse} timeout="auto" unmountOnExit>
+                                </ListItem>}
+                                {!!user && <Collapse in={openAttendanceCollapse} timeout="auto" unmountOnExit>
                                     <ListItem key="Entry" disablePadding>
                                         <ListItemButton component={Link} to='/attendance/entry'>
                                             <ListItemText inset primary="Entry" />
@@ -124,45 +143,54 @@ const Layout = (props) => {
                                             <ListItemText inset primary="Monitoring" />
                                         </ListItemButton>
                                     </ListItem>
-                                </Collapse>
-                                <ListItem key="Compliance" disablePadding>
+                                </Collapse>}
+                                {!!user && <ListItem key="Compliance" disablePadding>
                                     <ListItemButton component={Link} to='/compliance'>
                                         <ListItemIcon>
                                             <GradingIcon />
                                         </ListItemIcon>
                                         <ListItemText primary="Compliance" />
                                     </ListItemButton>
-                                </ListItem>
-                                <ListItem key="Reports" disablePadding>
+                                </ListItem>}
+                                {!!user && <ListItem key="Reports" disablePadding>
                                     <ListItemButton component={Link} to='/reports'>
                                         <ListItemIcon>
                                             <SummarizeIcon />
                                         </ListItemIcon>
                                         <ListItemText primary="Reports" />
                                     </ListItemButton>
-                                </ListItem>
+                                </ListItem>}
+                                {!!user && <ListItem key="Create Account" disablePadding>
+                                <ListItemButton component={Link} to='/create-account'>
+                                        <ListItemIcon>
+                                            <PersonAddIcon />
+                                        </ListItemIcon>
+                                        <ListItemText primary="Create Account" />
+                                    </ListItemButton>
+                                </ListItem>}
                             </List>
-                            <Divider />
+                            {!!user && <Divider />}
                             <List>
-                                <ListItem key="Help" disablePadding>
+                                {!!user && <ListItem key="Help" disablePadding>
                                     <ListItemButton component={Link} to='/help'>
                                         <ListItemIcon>
                                             <HelpIcon />
                                         </ListItemIcon>
                                         <ListItemText primary="Help" />
                                     </ListItemButton>
-                                </ListItem>
+                                </ListItem>}
                             </List>
                         </Box>
                     </Drawer>
                     <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
                         <Toolbar />
-                        {props.children}
+                        {children}
                     </Box>
                 </Box>
             </header>
         </div>
-    )
+
+    );
 }
 
 export default Layout;
