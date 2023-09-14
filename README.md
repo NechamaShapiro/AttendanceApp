@@ -2,7 +2,7 @@
 This is an app to help schools keep track of student attendance.
 Teachers get a login that brings them straight to their current class's attendance page, to ensure quick and easy attendance.
 The administration of the school gets a different login that gives them access to the entire app.
-(These logins are not created yet.)
+(These logins are still being worked on.)
 To get started, in the menu bar on the left there is a "database setup" tab. Under this tab, there are options to enter students, class splits, and courses. 
 Next, there is an "attendance" tab. Under this tab, there are 2 options: "entry" and "monitoring". Under entry, you can either enter attendance by student or by teacher. By teacher brings up the teacher's current class, and by student brings up all of the student's classes for today. The teacher login will bring the teacher straight to her class's attendance page. Under monitoring, you can either monitor only the current period or the entire day. Monitoring pulls up a list of all the teachers who teach during a specified period and whether or not they took attendance. Monitor today brings up a table of all the periods in the day. Each row is expandable so you can easily check up on a specific period. Additionally, there is a column that says whether or not all the teachers in that period took attendance, so you can easily scan the table and see where teachers did not take attendance. (This part is not implemented yet.)
 The next 2 tabs in the menu are "compliance" and "reports". These are for bringing up specific records according to your present needs. The compliance tab is for calculating compliance grades at the end of the term, and the reports tab is for all other reports you might want to see throughout the year.
