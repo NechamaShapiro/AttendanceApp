@@ -11,7 +11,7 @@ namespace AttendanceApp.Web.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    //[Authorize(Roles = "Teacher")]
     public class AppController : ControllerBase
     {
         private readonly string _connectionString;

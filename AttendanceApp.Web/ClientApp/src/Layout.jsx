@@ -14,6 +14,7 @@ import {
     ListItemIcon,
     ListItemText,
     Collapse,
+    Button,
     IconButton,
     Tooltip
 } from "@mui/material";
@@ -53,14 +54,30 @@ const Layout = ({ children }) => {
                                     Attendance App
                                 </Typography>
                             </Box>
-                            {!!user && <Box sx={{ flexGrow: 0 }}>
+                            {!user && <Box sx={{ flexGrow: 0 }}>
                                 <Tooltip>
-                                    <IconButton sx={{ p: 0 }}>
-                                        <PersonIcon></PersonIcon>
-                                        <Typography>{user.username}</Typography>
-                                    </IconButton>
+                                    <Button sx={{ p: 0, color: 'white' }} component={Link} to='/login'>
+                                        <LoginIcon />
+                                        <Typography>Login</Typography>
+                                    </Button>
                                 </Tooltip>
                             </Box>}
+                            {!!user && <Box sx={{ flexGrow: 0 }}>
+                                <Tooltip>
+                                    <Button sx={{ p: 0, color: 'white' }} component={Link} to='/logout'>
+                                        <LogoutIcon />
+                                        <Typography>Logout</Typography>
+                                    </Button>
+                                </Tooltip>
+                            </Box>}
+                            <Box sx={{ flexGrow: 0 }}>
+                                <Tooltip>
+                                    <ListItem sx={{ p: 0 }} style={{margin: '15px'}}>
+                                        <PersonIcon />
+                                        <Typography>{!!user ? user.username : "Logged out"}</Typography>
+                                    </ListItem>
+                                </Tooltip>
+                            </Box>
                         </Toolbar>
                     </AppBar>
                     <Drawer
@@ -82,23 +99,15 @@ const Layout = ({ children }) => {
                                         <ListItemText primary="Home" />
                                     </ListItemButton>
                                 </ListItem>
-                                {!user && <ListItem key="Login" disablePadding>
-                                    <ListItemButton component={Link} to='/login'>
+                                {!!user && user.role === 'Admin' && <ListItem key="Create Account" disablePadding>
+                                    <ListItemButton component={Link} to='/create-account'>
                                         <ListItemIcon>
-                                            <LoginIcon />
+                                            <PersonAddIcon />
                                         </ListItemIcon>
-                                        <ListItemText primary="Login" />
+                                        <ListItemText primary="Create Account" />
                                     </ListItemButton>
                                 </ListItem>}
-                                {!!user && <ListItem key="Logout" disablePadding>
-                                    <ListItemButton component={Link} to='/logout'>
-                                        <ListItemIcon>
-                                            <LogoutIcon />
-                                        </ListItemIcon>
-                                        <ListItemText primary="Logout" />
-                                    </ListItemButton>
-                                </ListItem>}
-                                {!!user && <ListItem key="Database Setup" disablePadding>
+                                {!!user && (user.role === 'Admin' || user.role === 'Office') && <ListItem key="Database Setup" disablePadding>
                                     <ListItemButton onClick={handleOpenDatabaseCollapse}>
                                         <ListItemIcon>
                                             {openDatabaseCollapse ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
@@ -106,7 +115,7 @@ const Layout = ({ children }) => {
                                         <ListItemText primary="Database Setup" />
                                     </ListItemButton>
                                 </ListItem>}
-                                {!!user && <Collapse in={openDatabaseCollapse} timeout="auto" unmountOnExit>
+                                {!!user && (user.role === 'Admin' || user.role === 'Office') && <Collapse in={openDatabaseCollapse} timeout="auto" unmountOnExit>
                                     <ListItem key="Enter Students" disablePadding>
                                         <ListItemButton component={Link} to='/database/enter-students'>
                                             <ListItemText inset primary="Enter Students" />
@@ -124,7 +133,13 @@ const Layout = ({ children }) => {
                                     </ListItem>
                                 </Collapse>}
 
-                                {!!user && <ListItem key="Attendance" disablePadding>
+                                {!!user && user.role === 'Teacher' && <ListItem key="Attendance Entry" disablePadding>
+                                    <ListItemButton component={Link} to='/attendance/entry'>
+                                        <ListItemText primary="Attendance Entry" />
+                                    </ListItemButton>
+                                </ListItem>}
+
+                                {!!user && (user.role === 'Admin' || user.role === 'Office') && <ListItem key="Attendance" disablePadding>
                                     <ListItemButton onClick={handleOpenAttendanceCollapse}>
                                         <ListItemIcon>
                                             {openAttendanceCollapse ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
@@ -132,7 +147,7 @@ const Layout = ({ children }) => {
                                         <ListItemText primary="Attendance" />
                                     </ListItemButton>
                                 </ListItem>}
-                                {!!user && <Collapse in={openAttendanceCollapse} timeout="auto" unmountOnExit>
+                                {!!user && (user.role === 'Admin' || user.role === 'Office') && <Collapse in={openAttendanceCollapse} timeout="auto" unmountOnExit>
                                     <ListItem key="Entry" disablePadding>
                                         <ListItemButton component={Link} to='/attendance/entry'>
                                             <ListItemText inset primary="Entry" />
@@ -144,7 +159,7 @@ const Layout = ({ children }) => {
                                         </ListItemButton>
                                     </ListItem>
                                 </Collapse>}
-                                {!!user && <ListItem key="Compliance" disablePadding>
+                                {!!user && (user.role === 'Admin' || user.role === 'Office') && <ListItem key="Compliance" disablePadding>
                                     <ListItemButton component={Link} to='/compliance'>
                                         <ListItemIcon>
                                             <GradingIcon />
@@ -152,7 +167,7 @@ const Layout = ({ children }) => {
                                         <ListItemText primary="Compliance" />
                                     </ListItemButton>
                                 </ListItem>}
-                                {!!user && <ListItem key="Reports" disablePadding>
+                                {!!user && (user.role === 'Admin' || user.role === 'Office') && <ListItem key="Reports" disablePadding>
                                     <ListItemButton component={Link} to='/reports'>
                                         <ListItemIcon>
                                             <SummarizeIcon />
@@ -160,18 +175,10 @@ const Layout = ({ children }) => {
                                         <ListItemText primary="Reports" />
                                     </ListItemButton>
                                 </ListItem>}
-                                {!!user && <ListItem key="Create Account" disablePadding>
-                                <ListItemButton component={Link} to='/create-account'>
-                                        <ListItemIcon>
-                                            <PersonAddIcon />
-                                        </ListItemIcon>
-                                        <ListItemText primary="Create Account" />
-                                    </ListItemButton>
-                                </ListItem>}
                             </List>
                             {!!user && <Divider />}
                             <List>
-                                {!!user && <ListItem key="Help" disablePadding>
+                                {!!user && (user.role === 'Admin' || user.role === 'Office') && <ListItem key="Help" disablePadding>
                                     <ListItemButton component={Link} to='/help'>
                                         <ListItemIcon>
                                             <HelpIcon />

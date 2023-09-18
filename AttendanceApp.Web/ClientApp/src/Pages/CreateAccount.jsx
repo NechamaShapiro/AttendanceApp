@@ -1,48 +1,285 @@
-import React, { useState } from 'react';
+// import React, { useState } from 'react';
+// import { useNavigate } from 'react-router-dom';
+// import axios from 'axios';
+// import {
+//   Container,
+//   Paper,
+//   TextField,
+//   Button,
+//   Typography,
+//   FormControl,
+//   InputLabel,
+//   Select,
+//   MenuItem,
+// } from '@mui/material';
+
+// const CreateAccount = () => {
+//   const navigate = useNavigate();
+
+//   const [formData, setFormData] = useState({
+//     firstName: '',
+//     lastName: '',
+//     username: '',
+//     password: '',
+//     role: '', 
+//   });
+
+//   const onTextChange = (e) => {
+//     const copy = { ...formData };
+//     copy[e.target.name] = e.target.value;
+//     setFormData(copy);
+//   };
+
+//   const onFormSubmit = async (e) => {
+//     e.preventDefault();
+//     await axios.post('/api/account/createaccount', formData);
+//     navigate('/');
+//   };
+
+//   return (
+//     <Container
+//       maxWidth="sm"
+//       style={{
+//         minHeight: '80vh',
+//         display: 'flex',
+//         alignItems: 'center',
+//         justifyContent: 'center',
+//       }}
+//     >
+//       <Paper elevation={3} style={{ padding: '2rem' }}>
+//         <Typography variant="h4" gutterBottom>
+//           Create a new account
+//         </Typography>
+//         <form onSubmit={onFormSubmit}>
+//           <TextField
+//             fullWidth
+//             label="First Name"
+//             name="firstName"
+//             value={formData.firstName}
+//             onChange={onTextChange}
+//             variant="outlined"
+//             margin="normal"
+//           />
+//           <TextField
+//             fullWidth
+//             label="Last Name"
+//             name="lastName"
+//             value={formData.lastName}
+//             onChange={onTextChange}
+//             variant="outlined"
+//             margin="normal"
+//           />
+//           <FormControl fullWidth variant="outlined" margin="normal">
+//             <InputLabel htmlFor="role">Role</InputLabel>
+//             <Select
+//               label="Role"
+//               name="role"
+//               value={formData.role}
+//               onChange={onTextChange}
+//             >
+//               <MenuItem value="Admin">Admin</MenuItem>
+//               <MenuItem value="Office">Office</MenuItem>
+//               <MenuItem value="Teacher">Teacher</MenuItem>
+//             </Select>
+//           </FormControl>
+//           <TextField
+//             fullWidth
+//             label="Username"
+//             name="username"
+//             value={formData.username}
+//             onChange={onTextChange}
+//             variant="outlined"
+//             margin="normal"
+//           />
+//           <TextField
+//             fullWidth
+//             label="Password"
+//             name="password"
+//             value={formData.password}
+//             onChange={onTextChange}
+//             type="password"
+//             variant="outlined"
+//             margin="normal"
+//           />
+//           <Button
+//             type="submit"
+//             variant="contained"
+//             color="primary"
+//             fullWidth
+//             style={{ marginTop: '1rem' }}
+//           >
+//             Create Account
+//           </Button>
+//         </form>
+//       </Paper>
+//     </Container>
+//   );
+// };
+
+// export default CreateAccount;
+
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import {
+  Container,
+  Paper,
+  TextField,
+  Button,
+  Typography,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Autocomplete, // Import Autocomplete
+} from '@mui/material';
 
 const CreateAccount = () => {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
-    const [formData, setFormData] = useState({
-        firstName: '',
-        lastName: '',
-        username: '',
-        password: ''
-    });
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    username: '',
+    password: '',
+    role: '',
+    teacherId: '', // Add a field for teacherId
+  });
 
-    const onTextChange = e => {
-        const copy = { ...formData };
-        copy[e.target.name] = e.target.value;
-        setFormData(copy);
-    }
+  const [teachers, setTeachers] = useState([]); // State for storing the list of teachers
 
-    const onFormSubmit = async e => {
-        e.preventDefault();
-        await axios.post('/api/account/createaccount', formData);
-        navigate('/login');
-    }
+  useEffect(() => {
+    // Fetch the list of teachers from the database and update the state
+    const fetchTeachers = async () => {
+      try {
+        const { data } = await axios.get('/api/app/getteachers');
+        data.sort(function (a, b) {
+          if (a.name < b.name) {
+            return -1;
+          }
+          if (a.name > b.name) {
+            return 1;
+          }
+          return 0;
+        });
+        setTeachers(data);
+      } catch (error) {
+        console.error('Error fetching teachers:', error);
+      }
+    };
 
-    return (
-        <div className="row" style={{ minHeight: "80vh", display: "flex", alignItems: "center" }}>
-            <div className="col-md-6 offset-md-3 bg-light p-4 rounded shadow">
-                <h3>Create a new account</h3>
-                <form onSubmit={onFormSubmit}>
-                    <input onChange={onTextChange} value={formData.firstName} type="text" name="firstName" placeholder="First Name" className="form-control" />
-                    <br />
-                    <input onChange={onTextChange} value={formData.lastName} type="text" name="lastName" placeholder="Last Name" className="form-control" />
-                    <br />
-                    <input onChange={onTextChange} value={formData.username} type="text" name="username" placeholder="Username" className="form-control" />
-                    <br />
-                    <input onChange={onTextChange} value={formData.password} type="password" name="password" placeholder="Password" className="form-control" />
-                    <br />
-                    <button className="btn btn-primary">Create Account</button>
-                </form>
-            </div>
-        </div>
-    );
+    fetchTeachers();
+  }, []);
 
-}
+  const onTextChange = (e) => {
+    const copy = { ...formData };
+    copy[e.target.name] = e.target.value;
+    setFormData(copy);
+  };
+
+  const onFormSubmit = async (e) => {
+    e.preventDefault();
+    await axios.post('/api/account/createaccount', formData);
+    navigate('/');
+  };
+
+  return (
+    <Container
+      maxWidth="sm"
+      style={{
+        minHeight: '80vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <Paper elevation={3} style={{ padding: '2rem' }}>
+        <Typography variant="h4" gutterBottom>
+          Create a new account
+        </Typography>
+        <form onSubmit={onFormSubmit}>
+          <TextField
+            fullWidth
+            label="First Name"
+            name="firstName"
+            value={formData.firstName}
+            onChange={onTextChange}
+            variant="outlined"
+            margin="normal"
+          />
+          <TextField
+            fullWidth
+            label="Last Name"
+            name="lastName"
+            value={formData.lastName}
+            onChange={onTextChange}
+            variant="outlined"
+            margin="normal"
+          />
+          <FormControl fullWidth variant="outlined" margin="normal">
+            <InputLabel htmlFor="role">Role</InputLabel>
+            <Select
+              label="Role"
+              name="role"
+              value={formData.role}
+              onChange={onTextChange}
+            >
+              <MenuItem value="Admin">Admin</MenuItem>
+              <MenuItem value="Office">Office</MenuItem>
+              <MenuItem value="Teacher">Teacher</MenuItem>
+            </Select>
+          </FormControl>
+          {formData.role === 'Teacher' && ( // Conditionally render for the 'Teacher' role
+            <Autocomplete
+              options={teachers}
+              getOptionLabel={(option) => option.name} // Adjust to match your data structure
+              onChange={(event, newValue) => {
+                const copy = { ...formData };
+                copy.teacherId = newValue ? newValue.id : '';
+                setFormData(copy);
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Select a Teacher"
+                  variant="outlined"
+                  margin="normal"
+                />
+              )}
+            />
+          )}
+          <TextField
+            fullWidth
+            label="Username"
+            name="username"
+            value={formData.username}
+            onChange={onTextChange}
+            variant="outlined"
+            margin="normal"
+          />
+          <TextField
+            fullWidth
+            label="Password"
+            name="password"
+            value={formData.password}
+            onChange={onTextChange}
+            type="password"
+            variant="outlined"
+            margin="normal"
+          />
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            fullWidth
+            style={{ marginTop: '1rem' }}
+          >
+            Create Account
+          </Button>
+        </form>
+      </Paper>
+    </Container>
+  );
+};
 
 export default CreateAccount;

@@ -16,5 +16,6 @@ namespace AttendanceApp.Data
         [JsonIgnore]
         public string PasswordHash { get; set; }
         public string Role { get; set; }
+        public int? TeacherId { get; set; }
     }
 }

@@ -30,15 +30,7 @@ const AttendanceByTeacher = ({ teacherId }) => {
     const [students, setStudents] = useState([]);
 
     const [attendanceRecords, setAttendanceRecords] = useState([]);
-    // useEffect(() => {
-    //     console.log("Teacher id:", teacherId);
-    //     console.log("Teacher name:", teacherName);
-    //     console.log("Subject:", subject);
-    //     console.log("Grade:", setGrade);
-    //     console.log("Course id:", courseId);
-    //     console.log("Start time:", startTime);
-    //     console.log("End time:", endTime);
-    // }, [teacherName]);
+
     useEffect(() => {
         const getCourseInfo = async () => {
             try {
